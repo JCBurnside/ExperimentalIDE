@@ -17,4 +17,11 @@ namespace TemplateLoader.Exceptions
 
         public IllegalPipeException() : base("No Pipe Specified") { }
     }
+
+    public class IllegalPathException : Exception
+    {
+        public IllegalPathException() : base("The path is not valid") { }
+
+        public IllegalPathException(string path) : base($"The path '{path}' is not valid") { }
+    }
 }
