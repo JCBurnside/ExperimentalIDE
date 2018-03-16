@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TemplateLoader\TemplateLoader.csproj" />
+    <ProjectReference Include="..\..\Modules\TemplateLoader\TemplateLoader.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,7 +9,7 @@ namespace TemplateLoader
 
     public class TemplateParserBase
     {
-        public delegate string Pipe(string input, string format = null);
+        public delegate string Pipe(string input, string[] format=null);
         private static Dictionary<string, object> _Values = new Dictionary<string, object>();
         public static Dictionary<string, object> Values
         {

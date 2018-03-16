@@ -13,7 +13,7 @@ namespace TemplateLoader
     {
         private static Regex insertion = new Regex("{\\S{1,}}");
 
-        public static async Task FromFile(FileInfo file, CancellationToken token = default(CancellationToken))
+        public static async Task<string> FromFile(FileInfo file, CancellationToken token = default(CancellationToken))
         {
             string fileString = "";
             if (!Values.ContainsKey("extension")) Values["extension"] = "txt";
@@ -39,33 +39,40 @@ namespace TemplateLoader
                             continue;
                     }
                 }
-                insertion.Replace(line, (Match m) =>
+                string output = insertion.Replace(line, (Match m) =>
                 {
                     if (m.Value.Contains(":"))
                     {
                         string[] splits = m.Value.Split(":");
                         if (splits.Length <= 1) throw new IllegalPipeException();
-                        string output = splits[0];
+                        string result = splits[0];
                         foreach (string pipeId in splits.Skip(1))
                         {
-                            string pipeIdFiltered = pipeId.Remove(pipeId.LastIndexOf('}'));
-                            if (!Pipes.ContainsKey(pipeIdFiltered)) throw new IllegalPipeException(pipeIdFiltered);
-                            output = Pipes[pipeIdFiltered](output);
+                            string[] pipeAndArg = pipeId.Remove(pipeId.LastIndexOf('}')).Split(',');
+                            if (!Pipes.ContainsKey(pipeAndArg[0])) throw new IllegalPipeException(pipeAndArg[0]);
+                            result = Pipes[pipeAndArg[0]](result, pipeAndArg.Skip(1).ToArray());
                         }
-                        return output;
+                        return result;
                     }
                     else
                     {
                         if (Values.ContainsKey(m.Value))
                         {
+                            if (Values[m.Value] is DateTime dt)
+                            {
+                                if(Values.ContainsKey("dateTimeFormat")){
+                                    return dt.ToString((string)Values["dateTiemFormat"]);
+                                }
+                                return dt.ToShortDateString();
+                            }
                             return Values[m.Value].ToString();
                         }
                         return m.Value;
                     }
                 });
-                fileString += insertion + Environment.NewLine;
+                fileString += output + Environment.NewLine;
             }
-
+            return fileString;
         }
 
 
