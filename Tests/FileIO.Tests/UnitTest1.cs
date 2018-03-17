@@ -8,7 +8,7 @@ namespace FileIO.Tests
         [Fact]
         public void Test1()
         {
-            Assert.True(false, "NOPE!");
+            
         }
     }
 }
