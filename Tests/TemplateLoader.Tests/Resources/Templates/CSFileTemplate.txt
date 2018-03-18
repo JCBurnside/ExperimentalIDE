@@ -2,7 +2,7 @@
 ;outputLocation ~/
 using System;
 
-namespace {location:pathToNamespace} 
+namespace {location:pathToNamespace}
 {
     class {fileName}
     {

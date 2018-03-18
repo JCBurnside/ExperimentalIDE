@@ -9,9 +9,9 @@ namespace TemplateLoader
 {
     public class TemplateParserDirectory : TemplateParserBase
     {
-        public static Task<string> FromFile(FileInfo info, CancellationToken token = default(CancellationToken))
+        public static async Task FromFile(FileInfo info, CancellationToken token = default(CancellationToken))
         {
-            return Task.FromResult("");
+            
         }
     }
 }

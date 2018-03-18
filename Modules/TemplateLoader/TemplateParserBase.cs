@@ -9,14 +9,15 @@ namespace TemplateLoader
 
     public class TemplateParserBase
     {
-        public delegate string Pipe(string input, string[] format=null);
+        public delegate string Pipe(string input, string[] format = null);
         private static Dictionary<string, object> _Values = new Dictionary<string, object>();
         public static Dictionary<string, object> Values
         {
-            get {
-                if (!_Values.ContainsKey("outputPath"))
+            get
+            {
+                if (!_Values.ContainsKey("location"))
                 {
-                    _Values["outputPath"] = "~/";
+                    _Values["location"] = "~/";
                 }
                 if (!_Values.ContainsKey("workingDir"))
                 {
@@ -33,11 +34,32 @@ namespace TemplateLoader
 
         public static string ParseDirectoryPath(string path)
         {
-            if(path.StartsWith("~/"))
+            if (path.StartsWith("~/"))
                 return path.Replace("~/", (string)Values["workingDir"]);
-            if (path.StartsWith('/'))
-                return path.Replace("/", (string)Values["workingDir"]);
             return path;
+        }
+
+        protected static bool checkPreproccess(string line)
+        {
+            if (line.StartsWith(';'))
+            {
+                string[] args = line.Substring(1).Split(' ');
+                if (args.Length == 0) return true;
+                switch (args[0])
+                {
+                    case "fileType":
+                        if (args.Length != 2) break;
+                        Values["extension"] = args[1];
+                        break;
+                    case "outputPath":
+                    case "outputLocation":
+                        if (args.Length != 2) Values["location"] = "~/";
+                        else Values["location"] = args[1];
+                        break;
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

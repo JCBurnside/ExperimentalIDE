@@ -10,7 +10,15 @@ namespace TemplateLoader.Tests
         {
             foreach ((T1 key, T2 value) in other)
             {
-                self.Add(key,value);
+                self.Add(key, value);
+            }
+        }
+
+        internal static void AddOverride<T1, T2>(this Dictionary<T1, T2> self, Dictionary<T1, T2> other)
+        {
+            foreach ((T1 key, T2 value) in other)
+            {
+                self[key] = value;
             }
         }
     }

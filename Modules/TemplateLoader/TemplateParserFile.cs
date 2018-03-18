@@ -14,67 +14,75 @@ namespace TemplateLoader
         private static Regex insertion = new Regex("{\\S{1,}}");
 
         public static async Task<string> FromFile(FileInfo file, CancellationToken token = default(CancellationToken))
+        => FromArray(await File.ReadAllLinesAsync(file.FullName, token));
+
+
+        public static string FromArray(string[] lines, CancellationToken token = default(CancellationToken))
         {
-            string fileString = "";
-            if (!Values.ContainsKey("extension")) Values["extension"] = "txt";
-            if (!Values.ContainsKey("outputPath")) Values["outputPath"] = "~/";
-            foreach (string line in await File.ReadAllLinesAsync(file.FullName, token))
+            try
             {
-                if (line.StartsWith(';'))
+                List<string> outputList = new List<string>();
+                foreach (string line in lines)
                 {
-                    string[] args = line.Substring(1).Split(' ');
-                    if (args.Length == 0) continue;
-                    switch (args[0])
+                    token.ThrowIfCancellationRequested();
+                    if (!String.IsNullOrWhiteSpace(line))
                     {
-                        case "fileType":
-                            if (args.Length != 2) continue;
-                            Values["extension"] = args[1];
-                            continue;
-                        case "outputPath":
-                        case "outputLocation":
-                            if (args.Length != 2) Values["location"] = "~/";
-                            else Values["location"] = args[1];
-                            continue;
-                        default:
-                            continue;
-                    }
-                }
-                string output = insertion.Replace(line, (Match m) =>
-                {
-                    if (m.Value.Contains(":"))
-                    {
-                        string[] splits = m.Value.Split(":");
-                        if (splits.Length <= 1) throw new IllegalPipeException();
-                        string result = splits[0];
-                        foreach (string pipeId in splits.Skip(1))
-                        {
-                            string[] pipeAndArg = pipeId.Remove(pipeId.LastIndexOf('}')).Split(',');
-                            if (!Pipes.ContainsKey(pipeAndArg[0])) throw new IllegalPipeException(pipeAndArg[0]);
-                            result = Pipes[pipeAndArg[0]](result, pipeAndArg.Skip(1).ToArray());
-                        }
-                        return result;
+                        string output = fromString(line);
+                        if (output == string.Empty) continue;
+                        outputList.Add(output);
                     }
                     else
                     {
-                        if (Values.ContainsKey(m.Value))
-                        {
-                            if (Values[m.Value] is DateTime dt)
-                            {
-                                if(Values.ContainsKey("dateTimeFormat")){
-                                    return dt.ToString((string)Values["dateTiemFormat"]);
-                                }
-                                return dt.ToShortDateString();
-                            }
-                            return Values[m.Value].ToString();
-                        }
-                        return m.Value;
+                        outputList.Add(line);
                     }
-                });
-                fileString += output + Environment.NewLine;
+                }
+                return String.Join(Environment.NewLine,outputList);
             }
-            return fileString;
+            catch (OperationCanceledException)
+            {
+                return String.Empty;
+            }
         }
 
+        private static string fromString(string line)
+        {
+            if (checkPreproccess(line)) return string.Empty;
+            return insertion.Replace(line, (Match m) =>
+            {
+                string value = m.Value.Substring(1, m.Value.Length - 2);
+                if (value.Contains(":"))
+                {
+                    string[] splits = value.Split(":");
+                    if (splits.Length <= 1) throw new IllegalPipeException();
+                    string result = Values.ContainsKey(splits[0]) ? (string)Values[splits[0]] : splits[0];
+                    System.Diagnostics.Debug.WriteLineIf(Values.ContainsKey(result), Values.Where(kv => kv.Key == result).Select(kv => kv.Value).FirstOrDefault());
+                    foreach (string pipeId in splits.Skip(1))
+                    {
+                        string[] pipeAndArg = pipeId.Split(',');
+                        if (!Pipes.ContainsKey(pipeAndArg[0])) throw new IllegalPipeException(pipeAndArg[0]);
+                        result = Pipes[pipeAndArg[0]](result, pipeAndArg.Skip(1).ToArray());
+                    }
+                    System.Diagnostics.Debug.WriteLine(result);
+                    return result;
+                }
+                else
+                {
+                    if (Values.ContainsKey(value))
+                    {
+                        if (Values[value] is DateTime dt)
+                        {
+                            if (Values.ContainsKey("dateTimeFormat"))
+                            {
+                                return dt.ToString((string)Values["dateTimeFormat"]);
+                            }
+                            return dt.ToShortDateString();
+                        }
+                        return Values[value].ToString();
+                    }
+                    return value;
+                }
+            });
+        }
 
     }
 

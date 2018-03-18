@@ -2,7 +2,7 @@
 
 namespace Testing
 {
-    class CSFileTemplat
+    class CSFileTemplate
     {
     }
 }
