@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
 
-namespace TemplateLoader.Tests
+namespace TemplateLoader
 {
     internal static class Extenstions
     {
@@ -20,6 +23,17 @@ namespace TemplateLoader.Tests
             {
                 self[key] = value;
             }
+        }
+
+        internal static async Task<T> ReadContentAsAsync<T>(this XmlReader self, IXmlNamespaceResolver resolver, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            object returned = await self.ReadContentAsAsync(typeof(T), resolver);
+            if (returned is T t)
+            {
+                return t;
+            }
+            return default;
         }
     }
 }

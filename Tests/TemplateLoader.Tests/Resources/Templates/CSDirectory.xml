@@ -1,0 +1,5 @@
+﻿<Directory>
+    <Directory name="testing">
+        <File name="test.txt" />
+    </Directory>
+</Directory>

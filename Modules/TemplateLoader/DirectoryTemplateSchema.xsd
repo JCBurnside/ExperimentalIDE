@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DirectoryTemplateSchema"
+    elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+    <xs:element name="Directory">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Directory" type="DirectoryType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="File" type="FileType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="DirectoryType">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="Directory" type="DirectoryType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="File" type="FileType"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="template" type="xs:string" />
+    </xs:complexType>
+
+    <xs:complexType name="FileType">
+        <xs:attribute name="name" use="required">
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:pattern value="[\w,\s-\.]{1,}\.[A-Za-z\d]{1,}$"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="template" type="xs:string"/>
+    </xs:complexType>
+</xs:schema>

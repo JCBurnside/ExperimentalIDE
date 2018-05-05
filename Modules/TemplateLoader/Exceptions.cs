@@ -24,4 +24,6 @@ namespace TemplateLoader.Exceptions
 
         public IllegalPathException(string path) : base($"The path '{path}' is not valid") { }
     }
+
+
 }

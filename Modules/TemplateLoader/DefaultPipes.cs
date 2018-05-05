@@ -10,7 +10,7 @@ namespace TemplateLoader
     internal static class DefaultPipes
     {
 
-        internal static string PathToNamespace(string path, string[] args)
+        internal static string PathToNamespace(string path, IEnumerable<string> args)
         {
             if (path.Any(Path.GetInvalidPathChars().Contains)) throw new IllegalPipeArgumentException(nameof(PathToNamespace), nameof(path));
             if (path.StartsWith('~') &&
@@ -22,11 +22,12 @@ namespace TemplateLoader
             return path.Replace(' ', '_').Replace('/', '.');
         }
 
-        internal static string DateToString(string input, string[] args)
+        internal static string DateToString(string input, IEnumerable<string> args)
         {
-            if (args.Length == 0) args = new[] { "YYYY-MM-DD HHmm" };
+            if (args.Count() == 0) args = new[] { "YYYY-MM-DD HHmm" };
+            string[] argArray = args.ToArray();
             if (!DateTime.TryParse(input, out var time)) throw new IllegalPipeArgumentException(nameof(DateToString), nameof(input));
-            return time.ToString(args[0]);
+            return time.ToString(argArray[0]);
         }
 
     }

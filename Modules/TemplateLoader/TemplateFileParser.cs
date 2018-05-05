@@ -9,15 +9,20 @@ using TemplateLoader.Exceptions;
 
 namespace TemplateLoader
 {
-    public class TemplateParserFile : TemplateParserBase
+    public class TemplateFileParser : TemplateParserBase
     {
-        private static Regex insertion = new Regex("{\\S{1,}}");
+        public TemplateFileParser(Dictionary<string, object> values=null, Dictionary<string, Pipe> pipes=null) : base(values, pipes)
+        {
+        }
+        
 
-        public static async Task<string> FromFile(FileInfo file, CancellationToken token = default(CancellationToken))
+        protected override Regex Insertion { get; } = new Regex("{\\S{1,}}");
+
+        public async Task<FormatedFile> FromFile(FileInfo file, CancellationToken token = default(CancellationToken))
         => FromArray(await File.ReadAllLinesAsync(file.FullName, token));
 
 
-        public static string FromArray(string[] lines, CancellationToken token = default(CancellationToken))
+        public FormatedFile FromArray(string[] lines, CancellationToken token = default(CancellationToken))
         {
             try
             {
@@ -36,18 +41,22 @@ namespace TemplateLoader
                         outputList.Add(line);
                     }
                 }
-                return String.Join(Environment.NewLine,outputList);
+                return new FormatedFile
+                {
+                    Name = (string)Values["fileName"],
+                    Contents = String.Join(Environment.NewLine, outputList),
+                };
             }
             catch (OperationCanceledException)
             {
-                return String.Empty;
+                return null;
             }
         }
 
-        private static string fromString(string line)
+        private string fromString(string line)
         {
             if (checkPreproccess(line)) return string.Empty;
-            return insertion.Replace(line, (Match m) =>
+            return Insertion.Replace(line, (Match m) =>
             {
                 string value = m.Value.Substring(1, m.Value.Length - 2);
                 if (value.Contains(":"))

@@ -4,6 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27428.2002
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExperimentalIDE", "ExperimentalIDE\ExperimentalIDE.csproj", "{2D138EB9-3F65-4CB3-96B8-A6F847CDB240}"
+	ProjectSection(ProjectDependencies) = postProject
+		{56990A85-19FE-47C8-8BCE-393099D24CBB} = {56990A85-19FE-47C8-8BCE-393099D24CBB}
+		{75AA2BC6-DD27-4F52-A745-883B15438B7B} = {75AA2BC6-DD27-4F52-A745-883B15438B7B}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileIO", "Modules\FileIO\FileIO.csproj", "{56990A85-19FE-47C8-8BCE-393099D24CBB}"
 EndProject

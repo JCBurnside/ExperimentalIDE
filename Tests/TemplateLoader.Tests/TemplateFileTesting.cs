@@ -10,15 +10,13 @@ namespace TemplateLoader.Tests
         [Fact]
         public async void FileTemplateCSTest()
         {
-            FileInfo templateFile = new FileInfo("Resources/Templates/CSFileTemplate.txt");
-            FileInfo expectedFile = new FileInfo("Resources/Expected/CSFileTemplate.cs");
-            TemplateParserBase.Values.AddOverride(new Dictionary<string, object> { 
+            TemplateFileParser fileParser = new TemplateFileParser(new Dictionary<string, object>{
                { "ProjectName", "Testing" },
                { "fileName", "CSFileTemplate" }
             });
-            string templateOutput = await TemplateParserFile.FromFile(templateFile);
-            string expected = string.Join(Environment.NewLine, await File.ReadAllLinesAsync(expectedFile.FullName));
-            Assert.Equal(expected, templateOutput);
+            FileInfo templateFile = new FileInfo("Resources/Templates/CSFileTemplate.txt");
+            FileInfo expectedFile = new FileInfo("Resources/Expected/CSFileTemplate.cs");
+            Assert.Equal(await fileParser.FromFile(templateFile),(FormatedFile)expectedFile);
         }
     }
 }

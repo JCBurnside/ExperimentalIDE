@@ -1,5 +1,4 @@
 ﻿;fileType cs
-;outputLocation ~/
 using System;
 
 namespace {location:pathToNamespace}
